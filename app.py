@@ -1,8 +1,10 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import pickle
 import numpy as np
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 
 # Load your trained model
 model_data = None
@@ -22,11 +24,15 @@ def health():
     """Health check endpoint"""
     return jsonify({'status': 'ok', 'message': 'Model API is running'}), 200
 
-@app.route('/predict', methods=['POST'])
+@app.route('/predict', methods=['POST', 'OPTIONS'])
 def predict():
     """
     Predict home win probability using trained model
     """
+    # Handle CORS preflight
+    if request.method == 'OPTIONS':
+        return '', 200
+    
     try:
         print("\n" + "="*60)
         print("PREDICTION REQUEST RECEIVED")
